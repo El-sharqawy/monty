@@ -1,114 +1,125 @@
 #include "monty.h"
-#include <stdlib.h>
+
+/**
+* execute_command - execute the user command as opcode.
+* @op: an input content to be used.
+* @head: a pointer to the pointer of the stack_t linked list.
+* @line_num: an input line number.
+*
+* Return: void.
+*/
+void execute_command(char *op, stack_t **head, uint32_t *line_num)
+{
+	if (!strcmp(op, "push"))
+		_push(head, line_num);
+	else if (!strcmp(op, "pall"))
+		_pall(head);
+	else if (!strcmp(op, "pint"))
+		_pint(head, line_num);
+	else if (!strcmp(op, "add"))
+		_add(head, line_num);
+	else if (!strcmp(op, "pop"))
+		_pop(head, line_num);
+	else if (!strcmp(op, "nop"))
+		_nop(head);
+	else if (!strcmp(op, "swap"))
+		_swap(head, line_num);
+	else
+	{
+		fprintf(stderr, "L%u: unknown instruction: %s\n", *line_num, op);
+		free_tStack(*head);
+		exit(EXIT_FAILURE);
+	}
+}
 
 /**
 * _push - add node to the linked list.
 * @head: a pointer to pointer of struct stack_t linked list.
-* @count: the input number
+* @line_num: the input line number pointer
 *
 * Return: void
 */
-void _push(stack_t **head, uint32_t count)
+void _push(stack_t **head, uint32_t *line_num)
 {
-	int32_t num;
-	int32_t i = 0, f = 0;
+	int32_t val;
+	char *val_str;
+	stack_t *newNode;
 
-	if (myStack.arg != NULL)
+	val_str = strtok(NULL, " \t\n");
+	if (is_int(val_str) == 0 || val_str == NULL)
 	{
-		if (myStack.arg[0] == '-')
-			i++;
-		for (; myStack.arg[i] != '\0'; i++)
-		{
-			if (myStack.arg[i] < 48 || myStack.arg[i] > 57)
-				f = 1;
-		}
-		if (f == 1)
-		{
-			fprintf(stderr, "L%d: usage: push integer\n", count);
-			fclose(myStack.filename);
-			free(myStack.input);
-			free_tStack(*head);
-			exit(EXIT_FAILURE);
-		}
-	}
-	else
-	{
-		fprintf(stderr, "L%d: usage: push integer\n", count);
-		fclose(myStack.filename);
-		free(myStack.input);
-		free_tStack(*head);
+		fprintf(stderr, "L%u: usage: push integer\n", *line_num);
 		exit(EXIT_FAILURE);
 	}
-	num = atoi(myStack.arg);
-	if (myStack.flag == 0)
+	val = atoi(val_str);
+	newNode = malloc(sizeof(stack_t));
+	if (newNode == NULL)
 	{
-		add_node(head, num);
+		fprintf(stderr, "Error: malloc failed\n");
+		exit(EXIT_FAILURE);
 	}
-	else
+	newNode->n = val;
+	newNode->prev = NULL;
+	newNode->next = *head;
+	if ((*head) != NULL)
+		(*head)->prev = newNode;
+	*head = newNode;
+}
+
+/**
+ * _pop - remove element of the stack_t list
+ * @head: a pointer points to the stack_t head.
+ * @line_num: pointer to a line number.
+ *
+ * Return: void
+ */
+void _pop(stack_t **head, uint32_t *line_num)
+{
+	stack_t *myNode;
+
+	if ((*head) == NULL)
 	{
-		add_queue(head, num);
+		fprintf(stderr, "L%u: can't pop an empty stack\n", *line_num);
+		exit(EXIT_FAILURE);
+	}
+	myNode = *head;
+	*head = (*head)->next;
+	if ((*head) != NULL)
+		(*head)->prev = NULL;
+	free(myNode);
+}
+
+/**
+ * _pall - print the elements of my stackt_t list
+ * @head: a pointer points to the stack_t head.
+ *
+ * Return: void.
+ */
+void _pall(stack_t **head)
+{
+	stack_t *myNode;
+
+	myNode = *head;
+	while (myNode != NULL)
+	{
+		printf("%d\n", myNode->n);
+		myNode = myNode->next;
 	}
 }
 
 /**
-* add_node - add node to the doubly linked list at the head of the stack.
-* @head: a pointer to pointer that points to the head of the list.
-* @count: a node value.
-* Return: void
-*/
-void add_node(stack_t **head, uint32_t count)
+ * _pint - print element at the top of the stack_t list.
+ * @head: a pointer points to the stack_t head.
+ * @line_num: a pointer to the line number
+ *
+ * Return: void
+ */
+void _pint(stack_t **head, uint32_t *line_num)
 {
-	stack_t *myNode;
-	stack_t *temp;
-
-	temp = *head;
-	myNode = malloc(sizeof(stack_t));
-	if (myNode == NULL)
+	if ((*head) == NULL)
 	{
-		printf("Error\n");
-		exit(0);
+		fprintf(stderr, "L%u: can't pint, stack empty\n", *line_num);
+		exit(EXIT_FAILURE);
 	}
-	if (temp != NULL)
-		temp->prev = myNode;
-
-	myNode->n = count;
-	myNode->next = *head;
-	myNode->prev = NULL;
-	*head = myNode;
-}
-
-/**
-* add_queue - add node to the doubly linked list at the tail of the stack.
-* @head: a pointer to pointer that points to the head of the list.
-* @count: a node value.
-* Return: void
-*/
-void add_queue(stack_t **head, uint32_t count)
-{
-	stack_t *myNode;
-	stack_t *temp;
-
-	temp = *head;
-	myNode = malloc(sizeof(stack_t));
-	if (myNode == NULL)
-	{
-		printf("Error\n");
-	}
-	myNode->n = count;
-	myNode->next = NULL;
-	if (temp)
-	{
-		while (temp->next)
-			temp = temp->next;
-	}
-	if (!temp)
-	{
-		*head = myNode;
-		myNode->prev = NULL;
-	}
-	else
-	{
-		temp->next = myNode;
-		myNode->prev = temp;
-	}
+	printf("%d\n", (*head)->n);
 }

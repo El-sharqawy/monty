@@ -10,11 +10,10 @@ void free_tStack(stack_t *head)
 {
 	stack_t *stack;
 
-	stack = head;
 	while (head != NULL)
 	{
-		stack = head->next;
-		free(head);
-		head = stack;
+		stack = head;
+		head = head->next;
+		free(stack);
 	}
 }

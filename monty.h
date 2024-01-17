@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <ctype.h>
@@ -42,35 +41,19 @@ typedef struct instruction_s
 	void (*f)(stack_t **stack, unsigned int line_number);
 } instruction_t;
 
-/**
-* struct SMyStack - struct for my program architecture.
-* @arg: an argument passed to the struct.
-* @filename: pointer to monty file.
-* @input: an input content.
-* @flag: flag to change the stack/queue.
-*
-* Description: a struct that carries and pas the values through our program.
-*/
-typedef struct SMyStack
-{
-	char *arg;
-	FILE *filename;
-	char *input;
-	int flag;
-} TMyStack;
+extern stack_t *myStack;
+extern uint32_t line_num;
 
-extern TMyStack myStack;
-
-int32_t execute_command(char *input, stack_t **head, uint32_t n, FILE *file);
+void execute_command(char *op, stack_t **head, uint32_t *line_num);
 void free_tStack(stack_t *head);
-void _push(stack_t **head, uint32_t count);
-void _pop(stack_t **head, uint32_t count);
-void _pall(stack_t **head, uint32_t count);
-void _pint(stack_t **head, uint32_t count);
-void _swap(stack_t **head, uint32_t count);
-void _add(stack_t **head, uint32_t count);
+void _push(stack_t **head, uint32_t *line_num);
+void _pop(stack_t **head, uint32_t *line_num);
+void _pall(stack_t **head);
+void _nop(stack_t **head);
+void _pint(stack_t **head, uint32_t *line_num);
+void _swap(stack_t **head, uint32_t *line_num);
+void _add(stack_t **head, uint32_t *line_num);
 
-void add_node(stack_t **head, uint32_t count);
-void add_queue(stack_t **head, uint32_t count);
+int32_t is_int(const char *input);
 
 #endif /* __MONTY_H__ */
