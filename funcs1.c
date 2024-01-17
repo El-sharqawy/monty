@@ -1,52 +1,70 @@
 #include "monty.h"
 
 /**
-* execute_command - execute the user command as opcode.
-* @op: an input content to be used.
-* @head: a pointer to the pointer of the stack_t linked list.
-* @line_num: an input line number.
-*
-* Return: void.
-*/
+ * free_stack - free a doubly linked list from memory.
+ * @head: pointer to the head of the list.
+ *
+ * Return: void
+ */
+void free_stack(stack_t *head)
+{
+	stack_t *temp;
+
+	while (head != NULL)
+	{
+		temp = head;
+		head = head->next;
+		free(temp);
+	}
+}
+
+/**
+ * execute_command - execute the user command as opcode.
+ * @op: an input content to be used.
+ * @head: a pointer to the pointer of the stack_t linked list.
+ * @line_num: an input line number.
+ *
+ * Return: void.
+ */
 void execute_command(char *op, stack_t **head, uint32_t *line_num)
 {
 	if (!strcmp(op, "push"))
-		_push(head, line_num);
+		push_stack(head, line_num);
 	else if (!strcmp(op, "pall"))
-		_pall(head);
+		pall_stack(head);
 	else if (!strcmp(op, "pint"))
-		_pint(head, line_num);
+		pint_stack(head, line_num);
 	else if (!strcmp(op, "add"))
-		_add(head, line_num);
+		add_stack(head, line_num);
 	else if (!strcmp(op, "pop"))
-		_pop(head, line_num);
+		pop_stack(head, line_num);
 	else if (!strcmp(op, "nop"))
-		_nop(head);
+		nop_stack(head);
 	else if (!strcmp(op, "swap"))
-		_swap(head, line_num);
+		swap_stack(head, line_num);
 	else
 	{
 		fprintf(stderr, "L%u: unknown instruction: %s\n", *line_num, op);
-		free_tStack(*head);
+		free_stack(*head);
 		exit(EXIT_FAILURE);
 	}
 }
 
 /**
-* _push - add node to the linked list.
+* push_stack - add node to the linked list.
 * @head: a pointer to pointer of struct stack_t linked list.
 * @line_num: the input line number pointer
 *
 * Return: void
 */
-void _push(stack_t **head, uint32_t *line_num)
+void push_stack(stack_t **head, uint32_t *line_num)
 {
-	int32_t val;
+	int val;
 	char *val_str;
 	stack_t *newNode;
 
 	val_str = strtok(NULL, " \t\n");
-	if (is_int(val_str) == 0 || val_str == NULL)
+	if (is_integer(val_str) == 0 || val_str == NULL)
 	{
 		fprintf(stderr, "L%u: usage: push integer\n", *line_num);
 		exit(EXIT_FAILURE);
@@ -67,13 +85,13 @@ void _push(stack_t **head, uint32_t *line_num)
 }
 
 /**
- * _pop - remove element of the stack_t list
+ * pop_stack - remove element of the stack_t list
  * @head: a pointer points to the stack_t head.
  * @line_num: pointer to a line number.
  *
  * Return: void
  */
-void _pop(stack_t **head, uint32_t *line_num)
+void pop_stack(stack_t **head, uint32_t *line_num)
 {
 	stack_t *myNode;
 
@@ -90,12 +108,12 @@ void _pop(stack_t **head, uint32_t *line_num)
 }
 
 /**
- * _pall - print the elements of my stackt_t list
+ * pall_stack - print the elements of my stackt_t list
  * @head: a pointer points to the stack_t head.
  *
  * Return: void.
  */
-void _pall(stack_t **head)
+void pall_stack(stack_t **head)
 {
 	stack_t *myNode;
 
@@ -107,19 +125,3 @@ void _pall(stack_t **head)
 	}
 }
 
-/**
- * _pint - print element at the top of the stack_t list.
- * @head: a pointer points to the stack_t head.
- * @line_num: a pointer to the line number
- *
- * Return: void
- */
-void _pint(stack_t **head, uint32_t *line_num)
-{
-	if ((*head) == NULL)
-	{
-		fprintf(stderr, "L%u: can't pint, stack empty\n", *line_num);
-		exit(EXIT_FAILURE);
-	}
-	printf("%d\n", (*head)->n);
-}

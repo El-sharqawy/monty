@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 	FILE *filename;
 	char *input = NULL, *op;
 	stack_t *stack;
-	uint32_t line = 1;
+	uint32_t line_num = 1;
 
 	if (argc != 2)
 	{
@@ -35,12 +35,14 @@ int main(int argc, char *argv[])
 	while (fgets(input, 256, filename) != NULL)
 	{
 		op = strtok(input, " \t\n");
-		if (op && strcmp(op, "#") != 0)
-			execute_command(op, &stack, &line);
-		line++;
+		if (op != NULL && strcmp(op, "#") != 0)
+		{
+			execute_command(op, &stack, &line_num);
+		}
+		line_num++;
 	}
+	fclose(filename);
 	free(input);
 	free_tStack(stack);
-	fclose(filename);
 	return (EXIT_SUCCESS);
 }
